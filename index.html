@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LexAI — Legal Case Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1B2A4A;
+    --navy-light: #243659;
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --bg: #F8F7F4;
+    --white: #FFFFFF;
+    --text: #2C2C2C;
+    --text-muted: #6B6B6B;
+    --border: #E0DDD6;
+    --blue-tint: #EBF1FB;
+    --red-tint: #FBEAEA;
+    --success: #1A6B3A;
+    --success-bg: #E6F4EC;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* NAVBAR */
+  nav {
+    background: var(--navy);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav-logo {
+    width: 32px; height: 32px;
+    background: var(--gold);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--navy);
+  }
+  .nav-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.02em;
+  }
+  .nav-tagline {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.05em;
+  }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  #reset-btn {
+    display: none;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.2s;
+  }
+  #reset-btn:hover { background: rgba(255,255,255,0.2); }
+
+  /* API KEY WIDGET */
+  .api-key-widget select {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    min-width: 90px;
+    text-align: center;
+  }
+  .api-key-widget select option { background: #1B2A4A; color: white; }
+
+  .api-key-widget {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-sm);
+    padding: 5px 10px;
+    transition: border-color 0.2s;
+  }
+  .api-key-widget.connected { border-color: rgba(74,210,120,0.5); background: rgba(74,210,120,0.08); }
+  .api-key-widget.error { border-color: rgba(220,80,80,0.5); background: rgba(220,80,80,0.08); }
+
+  .api-key-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    white-space: nowrap;
+  }
+  .api-key-input-wrap { position: relative; display: flex; align-items: center; }
+  #api-key-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-family: 'Inter', monospace;
+    color: white;
+    width: 200px;
+    letter-spacing: 0.02em;
+  }
+  #api-key-input::placeholder { color: rgba(255,255,255,0.3); font-family: 'Inter', sans-serif; letter-spacing: 0; }
+
+  .api-toggle-vis {
+    background: none; border: none; cursor: pointer;
+    color: rgba(255,255,255,0.4); font-size: 14px; padding: 0 2px;
+    line-height: 1; transition: color 0.15s;
+  }
+  .api-toggle-vis:hover { color: rgba(255,255,255,0.8); }
+
+  .api-connect-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .api-connect-btn:hover { background: rgba(255,255,255,0.22); }
+
+  /* STATUS INDICATOR */
+  .api-status {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 500; white-space: nowrap;
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  }
+  .status-dot.idle { background: rgba(255,255,255,0.25); }
+  .status-dot.checking { background: #F5C842; animation: blink 0.8s ease-in-out infinite; }
+  .status-dot.ok { background: #4AD278; }
+  .status-dot.fail { background: #E05555; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .status-text { color: rgba(255,255,255,0.6); font-size: 11px; }
+  .status-text.ok { color: #4AD278; }
+  .status-text.fail { color: #E08080; }
+
+  /* Upload screen API warning */
+  .api-warning {
+    margin-top: 1.25rem;
+    background: #FFF8EC;
+    border: 1px solid #EDD89A;
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #8A6A1A;
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+    display: none;
+  }
+  .api-warning.show { display: block; }
+
+  /* UPLOAD SCREEN */
+  #upload-screen {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  .upload-hero {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .upload-icon {
+    font-size: 56px;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .upload-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+  .upload-hero p {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 420px;
+  }
+  .upload-zone {
+    width: 100%;
+    max-width: 520px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    background: var(--white);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--gold);
+    background: #FDFCF8;
+  }
+  .upload-zone-icon { font-size: 40px; margin-bottom: 1rem; display: block; color: var(--text-muted); }
+  .upload-zone h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .upload-zone p { font-size: 13px; color: var(--text-muted); margin-bottom: 1.25rem; }
+  .upload-btn {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.2s;
+  }
+  .upload-btn:hover { background: var(--navy-light); }
+  .upload-formats { font-size: 12px; color: var(--text-muted); margin-top: 1rem; }
+  #file-input { display: none; }
+
+  /* ANALYZER SCREEN */
+  #analyzer-screen { display: none; }
+
+  .file-banner {
+    background: var(--navy);
+    padding: 10px 2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+  }
+  .file-banner span { color: white; font-weight: 500; }
+  .file-banner .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+  }
+
+  .main-layout {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    min-height: calc(100vh - 100px);
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem;
+    overflow-y: auto;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
+  .case-meta { margin-bottom: 1.5rem; }
+  .case-title-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+  .meta-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .meta-row .icon { font-size: 15px; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge-gold { background: #FDF3DC; color: #8A6A1A; }
+  .badge-navy { background: #E8EBF3; color: var(--navy); }
+
+  .parties-box {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+  }
+  .parties-box h4 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .party-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .party-row:last-child { margin-bottom: 0; }
+  .party-label {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    min-width: 72px; text-align: center; flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .label-p { background: var(--blue-tint); color: #1A3A7A; }
+  .label-d { background: var(--red-tint); color: #7A1A1A; }
+  .party-name { font-size: 13px; font-weight: 500; color: var(--text); }
+
+  /* TAB NAV */
+  .tab-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .tab-nav h4 {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); margin-bottom: 6px;
+  }
+  .tab-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    border: none; background: none;
+    font-size: 14px; font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.15s, color 0.15s;
+    width: 100%;
+  }
+  .tab-btn:hover { background: var(--bg); color: var(--text); }
+  .tab-btn.active { background: #E8EBF3; color: var(--navy); }
+  .tab-btn .tab-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    padding: 2rem;
+    overflow-y: auto;
+  }
+
+  /* LOADING */
+  #loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 16px;
+  }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--navy);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 15px; color: var(--text-muted); }
+  .loading-sub { font-size: 13px; color: var(--border); }
+
+  /* TAB CONTENT */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--gold);
+    display: inline-block;
+  }
+
+  .prose {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-line;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem; }
+
+  .section-block { margin-bottom: 1.75rem; }
+  .section-label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); margin-bottom: 0.75rem;
+  }
+
+  .numbered-list { list-style: none; padding: 0; }
+  .numbered-list li {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px; line-height: 1.6;
+  }
+  .numbered-list li:last-child { border-bottom: none; }
+  .num-badge {
+    min-width: 24px; height: 24px;
+    background: var(--navy); color: white;
+    border-radius: 50%; font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  .arg-card {
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+  }
+  .arg-card.plaintiff { background: var(--blue-tint); border-color: #C5D5EE; }
+  .arg-card.defendant { background: var(--red-tint); border-color: #EEC5C5; }
+  .arg-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 1rem; }
+  .arg-card.plaintiff h3 { color: #1A3A7A; }
+  .arg-card.defendant h3 { color: #7A1A1A; }
+  .arg-list { list-style: none; }
+  .arg-list li {
+    font-size: 13px; line-height: 1.6;
+    padding: 7px 0 7px 16px;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .arg-list li:last-child { border-bottom: none; }
+  .arg-list li::before {
+    content: ''; position: absolute; left: 0; top: 15px;
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .plaintiff .arg-list li::before { background: #1A3A7A; }
+  .defendant .arg-list li::before { background: #7A1A1A; }
+
+  .verdict-box {
+    background: var(--success-bg);
+    border: 1.5px solid #A8D5B8;
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .verdict-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--success); margin-bottom: 6px; }
+  .verdict-text { font-size: 16px; font-weight: 600; color: var(--success); }
+
+  .dissent-box {
+    background: #FFF8EC;
+    border: 1px solid #EDD89A;
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+  }
+  .dissent-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #8A6A1A; margin-bottom: 8px; }
+
+  .impact-box {
+    background: #F0EDF8;
+    border: 1px solid #C8C0E8;
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+  }
+  .impact-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #4A3A8A; margin-bottom: 8px; }
+
+  .insight-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    font-size: 14px; line-height: 1.6;
+  }
+
+  .ref-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 13px; line-height: 1.6;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .ref-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; color: var(--text-muted); }
+
+  /* CHAT */
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 200px);
+    max-height: 680px;
+  }
+  .suggested-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .chip {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .chip:hover { border-color: var(--navy); color: var(--navy); }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius) var(--radius) 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .msg { display: flex; gap: 10px; align-items: flex-start; }
+  .msg-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; flex-shrink: 0;
+  }
+  .msg-avatar.user { background: var(--navy); color: white; font-size: 11px; }
+  .msg-avatar.ai { background: var(--gold); color: var(--navy); font-size: 14px; }
+  .msg-bubble {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 0 var(--radius) var(--radius) var(--radius);
+    padding: 10px 14px;
+    font-size: 14px; line-height: 1.65;
+    max-width: 85%;
+  }
+  .msg.user { flex-direction: row-reverse; }
+  .msg.user .msg-bubble {
+    background: var(--navy);
+    color: white; border-color: var(--navy);
+    border-radius: var(--radius) 0 var(--radius) var(--radius);
+  }
+  .msg-bubble.thinking { color: var(--text-muted); font-style: italic; }
+
+  .chat-input-area {
+    display: flex; gap: 0;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    overflow: hidden;
+    background: var(--white);
+  }
+  .chat-input-area input {
+    flex: 1; padding: 12px 16px;
+    border: none; outline: none;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    background: transparent;
+    color: var(--text);
+  }
+  .chat-send-btn {
+    background: var(--navy);
+    color: white; border: none;
+    padding: 12px 20px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.15s;
+  }
+  .chat-send-btn:hover { background: var(--navy-light); }
+  .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .main-layout { grid-template-columns: 1fr; }
+    .left-panel { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    .tab-nav { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+    .tab-btn { padding: 6px 10px; font-size: 12px; }
+    .two-col { grid-template-columns: 1fr; }
+    .upload-hero h1 { font-size: 26px; }
+    nav { padding: 0 1rem; }
+    .right-panel { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">L</div>
+    <div>
+      <div class="nav-name">LexAI</div>
+      <div class="nav-tagline">Legal Case Intelligence</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button id="reset-btn" onclick="resetApp()">↑ Upload new case</button>
+    <div class="api-key-widget" id="api-widget">
+      <span class="api-key-label" style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.5);white-space:nowrap;">Gemini Key</span>
+      <div class="api-key-input-wrap">
+        <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off" onkeydown="if(event.key==='Enter') connectApi()" />
+        <button class="api-toggle-vis" onclick="toggleKeyVisibility()" title="Show/hide">👁</button>
+      </div>
+      <button class="api-connect-btn" onclick="connectApi()">Connect</button>
+      <div class="api-status">
+        <div class="status-dot idle" id="status-dot"></div>
+        <span class="status-text" id="status-text">Not connected</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- UPLOAD SCREEN -->
+<div id="upload-screen">
+  <div class="upload-hero">
+    <span class="upload-icon">⚖️</span>
+    <h1>Understand any legal case<br>in minutes</h1>
+    <p>Upload a case document and get a complete structured breakdown — facts, arguments, decision, precedents, and an AI chat.</p>
+  </div>
+  <div class="upload-zone" id="drop-zone" onclick="triggerUpload()">
+    <span class="upload-zone-icon">📄</span>
+    <h3>Drop your case PDF here</h3>
+    <p>Supports judgments, rulings, briefs, and legal opinions</p>
+    <button class="upload-btn" onclick="event.stopPropagation(); triggerUpload()">Browse file</button>
+    <p class="upload-formats">PDF format · Up to 32MB</p>
+  </div>
+  <div class="api-warning" id="api-warning">⚠️ Please connect your Gemini API key in the top-right before uploading a case.</div>
+  <input type="file" id="file-input" accept="application/pdf" />
+</div>
+
+<!-- ANALYZER SCREEN -->
+<div id="analyzer-screen">
+  <div class="file-banner">
+    <div class="dot"></div>
+    <span id="file-name-banner">case.pdf</span>
+    <span>— analyzing with LexAI</span>
+  </div>
+
+  <div class="main-layout">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+      <div class="case-meta" id="case-meta-section" style="display:none;">
+        <div class="case-title-text" id="meta-title">—</div>
+        <div class="meta-row">
+          <span class="icon">🏛</span>
+          <span id="meta-court">—</span>
+        </div>
+        <div class="meta-row">
+          <span class="icon">📅</span>
+          <span class="badge badge-gold" id="meta-year">—</span>
+        </div>
+        <div class="parties-box" style="margin-top:12px;">
+          <h4>Parties</h4>
+          <div class="party-row">
+            <span class="party-label label-p">Plaintiff</span>
+            <span class="party-name" id="meta-plaintiff">—</span>
+          </div>
+          <div class="party-row">
+            <span class="party-label label-d">Defendant</span>
+            <span class="party-name" id="meta-defendant">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-nav" id="tab-nav" style="display:none;">
+        <h4>Sections</h4>
+        <button class="tab-btn active" data-tab="summary">
+          <span class="tab-icon">📋</span> Summary
+        </button>
+        <button class="tab-btn" data-tab="facts">
+          <span class="tab-icon">📌</span> Facts &amp; Issues
+        </button>
+        <button class="tab-btn" data-tab="arguments">
+          <span class="tab-icon">⚡</span> Arguments
+        </button>
+        <button class="tab-btn" data-tab="decision">
+          <span class="tab-icon">⚖️</span> Decision
+        </button>
+        <button class="tab-btn" data-tab="insights">
+          <span class="tab-icon">💡</span> Insights
+        </button>
+        <button class="tab-btn" data-tab="chat">
+          <span class="tab-icon">💬</span> Ask the case
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <!-- LOADING -->
+      <div id="loading-state">
+        <div class="spinner"></div>
+        <div class="loading-text">Analyzing case document...</div>
+        <div class="loading-sub">Extracting facts, arguments, and legal reasoning</div>
+      </div>
+
+      <!-- SUMMARY TAB -->
+      <div class="tab-panel active" id="tab-summary" style="display:none;">
+        <div class="panel-title">Case Summary</div>
+        <div class="prose" id="summary-content"></div>
+      </div>
+
+      <!-- FACTS & ISSUES TAB -->
+      <div class="tab-panel" id="tab-facts" style="display:none;">
+        <div class="panel-title">Facts &amp; Legal Issues</div>
+        <div class="two-col">
+          <div class="section-block">
+            <div class="section-label">Key facts</div>
+            <ul class="numbered-list" id="facts-list"></ul>
+          </div>
+          <div class="section-block">
+            <div class="section-label">Legal issues</div>
+            <ul class="numbered-list" id="issues-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARGUMENTS TAB -->
+      <div class="tab-panel" id="tab-arguments" style="display:none;">
+        <div class="panel-title">Arguments</div>
+        <div class="two-col">
+          <div class="arg-card plaintiff">
+            <h3>🔵 Plaintiff's arguments</h3>
+            <ul class="arg-list" id="plaintiff-args"></ul>
+          </div>
+          <div class="arg-card defendant">
+            <h3>🔴 Defendant's arguments</h3>
+            <ul class="arg-list" id="defendant-args"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- DECISION TAB -->
+      <div class="tab-panel" id="tab-decision" style="display:none;">
+        <div class="panel-title">Court Decision</div>
+        <div class="verdict-box">
+          <div class="verdict-label">Verdict</div>
+          <div class="verdict-text" id="verdict-text"></div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Court's reasoning</div>
+          <div class="prose" id="reasoning-content"></div>
+        </div>
+        <div class="dissent-box" id="dissent-box" style="display:none;">
+          <div class="dissent-label">⚠️ Dissenting opinion</div>
+          <div class="prose" id="dissent-content" style="font-size:14px;"></div>
+        </div>
+        <div class="impact-box">
+          <div class="impact-label">🌐 Broader impact</div>
+          <div class="prose" id="impact-content" style="font-size:14px;"></div>
+        </div>
+      </div>
+
+      <!-- INSIGHTS TAB -->
+      <div class="tab-panel" id="tab-insights" style="display:none;">
+        <div class="panel-title">Key Insights</div>
+        <div class="section-block">
+          <div class="section-label">Legal insights</div>
+          <div id="insights-list"></div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Precedents cited</div>
+          <div id="precedents-list"></div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Statutes referenced</div>
+          <div id="statutes-list"></div>
+        </div>
+      </div>
+
+      <!-- CHAT TAB -->
+      <div class="tab-panel" id="tab-chat" style="display:none;">
+        <div class="panel-title">Ask the case</div>
+        <div class="suggested-chips" id="chip-area">
+          <button class="chip" onclick="useChip(this)">What was the main argument?</button>
+          <button class="chip" onclick="useChip(this)">Why did the court rule this way?</button>
+          <button class="chip" onclick="useChip(this)">What precedent does this set?</button>
+          <button class="chip" onclick="useChip(this)">Who won and why?</button>
+          <button class="chip" onclick="useChip(this)">What laws were applied?</button>
+        </div>
+        <div class="chat-container">
+          <div class="chat-messages" id="chat-messages">
+            <div class="msg">
+              <div class="msg-avatar ai">⚖️</div>
+              <div class="msg-bubble">Case analyzed. Ask me anything about the facts, arguments, legal reasoning, or implications of this case.</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Ask a question about this case..." />
+            <button class="chat-send-btn" id="send-btn" onclick="sendChat()">Send</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  let pdfBase64 = null;
+  let caseContext = '';
+  let chatHistory = [];
+  let apiKey = '';
+  let keyVisible = false;
+
+  const GEMINI_MODEL = 'gemini-1.5-flash';
+
+  function geminiUrl() {
+    return `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+  }
+
+  // ── API KEY ──────────────────────────────────────────
+  function toggleKeyVisibility() {
+    keyVisible = !keyVisible;
+    document.getElementById('api-key-input').type = keyVisible ? 'text' : 'password';
+  }
+
+  async function connectApi() {
+    const key = document.getElementById('api-key-input').value.trim();
+    if (!key) { setStatus('fail', 'Enter a key first'); return; }
+    setStatus('checking', 'Connecting…');
+
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: 'ping' }] }] })
+      });
+
+      if ([200, 400].includes(res.status)) {
+        apiKey = key;
+        setStatus('ok', 'Gemini connected');
+        document.getElementById('api-widget').classList.add('connected');
+        document.getElementById('api-widget').classList.remove('error');
+        document.getElementById('api-warning').classList.remove('show');
+      } else if ([401, 403].includes(res.status)) {
+        setStatus('fail', 'Invalid key');
+        document.getElementById('api-widget').classList.add('error');
+        document.getElementById('api-widget').classList.remove('connected');
+      } else {
+        setStatus('fail', 'Connection failed');
+        document.getElementById('api-widget').classList.add('error');
+        document.getElementById('api-widget').classList.remove('connected');
+      }
+    } catch {
+      setStatus('fail', 'Network error');
+      document.getElementById('api-widget').classList.add('error');
+      document.getElementById('api-widget').classList.remove('connected');
+    }
+  }
+
+  function setStatus(state, text) {
+    const dot = document.getElementById('status-dot');
+    const label = document.getElementById('status-text');
+    dot.className = 'status-dot ' + state;
+    label.className = 'status-text ' + (state === 'ok' ? 'ok' : state === 'fail' ? 'fail' : '');
+    label.textContent = text;
+  }
+
+  // ── GEMINI DIRECT API CALLS ──────────────────────────
+  async function callAI(systemPrompt, userMessage, base64Pdf) {
+    const textPart = { text: `${systemPrompt}\n\n${userMessage}` };
+    const parts = base64Pdf
+      ? [{ inline_data: { mime_type: 'application/pdf', data: base64Pdf } }, textPart]
+      : [textPart];
+
+    const res = await fetch(geminiUrl(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts }] })
+    });
+    const data = await res.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+
+  async function callAIChat(systemPrompt, messages) {
+    const geminiMessages = messages.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+
+    const res = await fetch(geminiUrl(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: geminiMessages
+      })
+    });
+    const data = await res.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+
+  // ── UPLOAD ───────────────────────────────────────────
+  function triggerUpload() {
+    if (!apiKey) {
+      document.getElementById('api-warning').classList.add('show');
+      document.getElementById('api-key-input').focus();
+      return;
+    }
+    document.getElementById('file-input').click();
+  }
+
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    if (!apiKey) { document.getElementById('api-warning').classList.add('show'); return; }
+    const f = e.dataTransfer.files[0];
+    if (f && f.type === 'application/pdf') handleFile(f);
+  });
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+  function handleFile(file) {
+    document.getElementById('file-name-banner').textContent = file.name;
+    document.getElementById('upload-screen').style.display = 'none';
+    document.getElementById('analyzer-screen').style.display = 'block';
+    document.getElementById('reset-btn').style.display = 'block';
+    document.getElementById('loading-state').style.display = 'flex';
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      pdfBase64 = e.target.result.split(',')[1];
+      analyzeCase();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── ANALYSIS ─────────────────────────────────────────
+  async function analyzeCase() {
+    const SYSTEM_PROMPT = `You are an expert legal analyst with deep knowledge of case law, statutes, and legal reasoning. When a user uploads a legal case document, analyze it thoroughly and return ONLY a JSON object with no markdown backticks, no preamble, no extra text.
+
+Return this exact structure:
+{
+  "case_title": "Full case name and citation",
+  "court": "Name of the court and jurisdiction",
+  "year": "Year of decision",
+  "parties": {
+    "plaintiff": "Name and role",
+    "defendant": "Name and role"
+  },
+  "summary": "3-4 paragraph plain-language summary covering the background, what happened, how it reached court, and the final outcome",
+  "facts": ["Key fact 1", "Key fact 2", "Key fact 3", "Key fact 4", "Key fact 5"],
+  "legal_issues": ["Legal question 1 the court had to decide", "Legal question 2", "Legal question 3"],
+  "arguments": {
+    "plaintiff": ["Main argument 1", "Main argument 2", "Main argument 3"],
+    "defendant": ["Main argument 1", "Main argument 2", "Main argument 3"]
+  },
+  "decision": "What the court decided and in whose favor",
+  "reasoning": "2-3 paragraphs explaining why the court ruled this way and the legal logic behind it",
+  "precedents_cited": ["Case name — what principle it established", "Case name — what principle it established"],
+  "statutes_referenced": ["Law or article name — how it was applied"],
+  "key_insights": ["Important legal insight or principle from this case", "What this case means for future similar cases", "Significance of this ruling in the broader legal context"],
+  "dissenting_opinion": "Summary of any dissenting opinion, or null if none",
+  "impact": "The broader legal, social, or policy significance of this ruling"
+}
+
+Rules:
+- Use plain, clear language in summaries and reasoning
+- If any field cannot be determined from the document, set its value to null
+- Never fabricate information — only extract what is present in the document
+- Always identify the jurisdiction and applicable legal system
+- Be fair and balanced to both sides when analyzing arguments`;
+
+    try {
+      const raw = await callAI(SYSTEM_PROMPT, 'Analyze this legal case document and return the JSON.', pdfBase64);
+      const clean = raw.replace(/```json|```/g, '').trim();
+      const c = JSON.parse(clean);
+
+      caseContext = `Case: ${c.case_title}. Court: ${c.court}. Year: ${c.year}. Summary: ${c.summary}. Facts: ${(c.facts||[]).join('; ')}. Legal issues: ${(c.legal_issues||[]).join('; ')}. Decision: ${c.decision}. Reasoning: ${c.reasoning}. Key insights: ${(c.key_insights||[]).join('; ')}. Impact: ${c.impact}`;
+      chatHistory = [];
+
+      renderCase(c);
+    } catch (err) {
+      document.getElementById('loading-state').innerHTML = `<div style="text-align:center;color:#c0392b;padding:2rem;"><div style="font-size:24px;margin-bottom:12px;">⚠️</div><div style="font-weight:600;margin-bottom:6px;">Analysis failed</div><div style="font-size:13px;color:#888;">Please check your API key and try again.</div></div>`;
+    }
+  }
+
+  function renderCase(c) {
+    document.getElementById('meta-title').textContent = c.case_title || 'Untitled Case';
+    document.getElementById('meta-court').textContent = c.court || '—';
+    document.getElementById('meta-year').textContent = c.year || '—';
+    document.getElementById('meta-plaintiff').textContent = c.parties?.plaintiff || '—';
+    document.getElementById('meta-defendant').textContent = c.parties?.defendant || '—';
+
+    document.getElementById('summary-content').textContent = c.summary || '';
+
+    renderNumberedList('facts-list', c.facts);
+    renderNumberedList('issues-list', c.legal_issues);
+
+    renderArgList('plaintiff-args', c.arguments?.plaintiff);
+    renderArgList('defendant-args', c.arguments?.defendant);
+
+    document.getElementById('verdict-text').textContent = c.decision || '—';
+    document.getElementById('reasoning-content').textContent = c.reasoning || '';
+    if (c.dissenting_opinion) {
+      document.getElementById('dissent-content').textContent = c.dissenting_opinion;
+      document.getElementById('dissent-box').style.display = 'block';
+    }
+    document.getElementById('impact-content').textContent = c.impact || '';
+
+    renderInsights('insights-list', c.key_insights);
+    renderRefs('precedents-list', c.precedents_cited, '⚖️');
+    renderRefs('statutes-list', c.statutes_referenced, '📜');
+
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('case-meta-section').style.display = 'block';
+    document.getElementById('tab-nav').style.display = 'flex';
+
+    showTab('summary');
+  }
+
+  function renderNumberedList(id, arr) {
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    (arr || ['—']).forEach((item, i) => {
+      el.innerHTML += `<li><span class="num-badge">${i+1}</span><span>${item}</span></li>`;
+    });
+  }
+
+  function renderArgList(id, arr) {
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    (arr || ['—']).forEach(item => { el.innerHTML += `<li>${item}</li>`; });
+  }
+
+  function renderInsights(id, arr) {
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    (arr || []).forEach(item => { el.innerHTML += `<div class="insight-card">${item}</div>`; });
+  }
+
+  function renderRefs(id, arr, icon) {
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    (arr || []).forEach(item => { el.innerHTML += `<div class="ref-card"><span class="ref-icon">${icon}</span><span>${item}</span></div>`; });
+    if (!arr || arr.length === 0) el.innerHTML = '<div style="font-size:13px;color:#999;">None identified in this document.</div>';
+  }
+
+  // ── TABS ─────────────────────────────────────────────
+  document.addEventListener('click', e => {
+    if (e.target.closest('.tab-btn')) showTab(e.target.closest('.tab-btn').dataset.tab);
+  });
+
+  function showTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    document.querySelectorAll('.tab-panel').forEach(p => { p.style.display = 'none'; p.classList.remove('active'); });
+    const panel = document.getElementById('tab-' + name);
+    if (panel) { panel.style.display = 'block'; panel.classList.add('active'); }
+  }
+
+  // ── CHAT ─────────────────────────────────────────────
+  let msgCounter = 0;
+
+  function useChip(btn) {
+    document.getElementById('chat-input').value = btn.textContent;
+    sendChat();
+  }
+
+  async function sendChat() {
+    const input = document.getElementById('chat-input');
+    const q = input.value.trim();
+    if (!q || !caseContext) return;
+    input.value = '';
+    document.getElementById('send-btn').disabled = true;
+
+    addMsg('user', q);
+    const thinkId = addMsg('ai', 'Thinking…', true);
+    chatHistory.push({ role: 'user', content: q });
+
+    try {
+      const CHAT_SYSTEM = `You are an expert legal analyst answering questions about a specific legal case. Here is the case context:\n\n${caseContext}\n\nAnswer questions accurately and concisely based on this case. Be direct and use plain language. If something isn't covered in the context, say so honestly.`;
+      const answer = await callAIChat(CHAT_SYSTEM, chatHistory);
+      chatHistory.push({ role: 'assistant', content: answer });
+      updateMsg(thinkId, answer);
+    } catch {
+      updateMsg(thinkId, 'Could not get a response. Please try again.');
+    }
+    document.getElementById('send-btn').disabled = false;
+  }
+
+  function addMsg(type, text, thinking = false) {
+    const id = 'msg-' + (++msgCounter);
+    const box = document.getElementById('chat-messages');
+    const avatar = type === 'user' ? 'You' : '⚖️';
+    box.innerHTML += `<div class="msg ${type}" id="${id}">
+      <div class="msg-avatar ${type}">${avatar}</div>
+      <div class="msg-bubble ${thinking ? 'thinking' : ''}">${text}</div>
+    </div>`;
+    box.scrollTop = box.scrollHeight;
+    return id;
+  }
+
+  function updateMsg(id, text) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.querySelector('.msg-bubble').classList.remove('thinking');
+      el.querySelector('.msg-bubble').textContent = text;
+      document.getElementById('chat-messages').scrollTop = 9999;
+    }
+  }
+
+  document.getElementById('chat-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+
+  // ── RESET ────────────────────────────────────────────
+  function resetApp() {
+    pdfBase64 = null; caseContext = ''; chatHistory = [];
+    document.getElementById('upload-screen').style.display = 'flex';
+    document.getElementById('analyzer-screen').style.display = 'none';
+    document.getElementById('reset-btn').style.display = 'none';
+    document.getElementById('file-input').value = '';
+    document.getElementById('chat-messages').innerHTML = `<div class="msg"><div class="msg-avatar ai">⚖️</div><div class="msg-bubble">Case analyzed. Ask me anything about the facts, arguments, legal reasoning, or implications of this case.</div></div>`;
+    document.getElementById('dissent-box').style.display = 'none';
+    document.getElementById('loading-state').style.display = 'flex';
+    document.getElementById('loading-state').innerHTML = `<div class="spinner"></div><div class="loading-text">Analyzing case document...</div><div class="loading-sub">Extracting facts, arguments, and legal reasoning</div>`;
+    document.getElementById('case-meta-section').style.display = 'none';
+    document.getElementById('tab-nav').style.display = 'none';
+  }
+</script>
+</body>
+</html>
